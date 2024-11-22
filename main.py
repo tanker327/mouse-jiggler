@@ -6,7 +6,7 @@ import random
 from datetime import datetime
 
 MIN_SLEEP_MINUTES = 3
-MAX_SLEEP_MINUTES = 7
+MAX_SLEEP_MINUTES = 6
 MAX_MOVEMENT_PIXELS = 50  # Maximum pixels to move in any direction
 
 # Format: {day_of_week: (start_hour, end_hour)}
