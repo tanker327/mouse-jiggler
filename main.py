@@ -27,8 +27,20 @@ while True:
 
     schedule = WORK_SCHEDULE[current_day]
     if schedule and schedule[0] <= current_hour < schedule[1]:
-        # Get current mouse position
+        # Get screen size and current mouse position
+        screen_width, screen_height = pyautogui.size()
         current_x, current_y = pyautogui.position()
+        
+        # Check if mouse is too close to screen edges
+        edge_threshold = MAX_MOVEMENT_PIXELS + 10
+        if (current_x < edge_threshold or 
+            current_y < edge_threshold or 
+            current_x > screen_width - edge_threshold or 
+            current_y > screen_height - edge_threshold):
+            # Move to screen center
+            pyautogui.moveTo(screen_width // 2, screen_height // 2)
+            current_x, current_y = screen_width // 2, screen_height // 2
+            print(f'Moved to center at {current_time.strftime("%I:%M:%S %p")}')
         
         # Generate small random movement
         delta_x = random.randint(-MAX_MOVEMENT_PIXELS, MAX_MOVEMENT_PIXELS)
