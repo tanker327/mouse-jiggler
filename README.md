@@ -39,3 +39,13 @@ WORK_SCHEDULE = {
     # ...
 }
 ```
+
+## Usage
+
+```bash
+python main.py
+```
+
+## Any idea or Suggestion?
+
+Feel free to open an issue or a PR.
