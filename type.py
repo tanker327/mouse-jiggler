@@ -16,8 +16,11 @@ def read_file_content(file_path):
         print(f"Error reading file: {e}")
         sys.exit(1)
 
-def type_file_content(file_path):
-    content = read_file_content(file_path)
+def type_file_content(input_text):
+    if input_text.startswith('@'):
+        content = read_file_content(input_text[1:])
+    else:
+        content = input_text
 
     print("Starting in...")
     for i in range(COUNTDOWN_SECONDS, 0, -1):
@@ -33,7 +36,8 @@ def type_file_content(file_path):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python type.py <file_path>")
+        print("Usage: python type.py <file_path or text>")
+        print("Use @filepath to read from file, or direct text to type")
         sys.exit(1)
         
     type_file_content(sys.argv[1])
