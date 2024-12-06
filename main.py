@@ -5,17 +5,17 @@ import time
 import random
 from datetime import datetime
 
-MIN_SLEEP_MINUTES = 3
-MAX_SLEEP_MINUTES = 6
+MIN_SLEEP_MINUTES = 2
+MAX_SLEEP_MINUTES = 4
 MAX_MOVEMENT_PIXELS = 50  # Maximum pixels to move in any direction
 
 # Format: {day_of_week: (start_hour, end_hour)}
 WORK_SCHEDULE = {
-    0: (9, 17),  # Monday: 9 AM - 5 PM
-    1: (9, 17),  # Tuesday
-    2: (9, 17),  # Wednesday
-    3: (9, 17),  # Thursday
-    4: (9, 17),  # Friday
+    0: (8, 18),  # Monday: 8 AM - 5 PM
+    1: (8, 18),  # Tuesday
+    2: (8, 18),  # Wednesday
+    3: (8, 18),  # Thursday
+    4: (8, 18),  # Friday
     5: None,     # Saturday: off
     6: None      # Sunday: off
 }
