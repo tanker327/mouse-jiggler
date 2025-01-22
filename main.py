@@ -11,11 +11,11 @@ MAX_MOVEMENT_PIXELS = 50  # Maximum pixels to move in any direction
 
 # Format: {day_of_week: (start_hour, end_hour)}
 WORK_SCHEDULE = {
-    0: (8, 18),  # Monday: 8 AM - 5 PM
-    1: (8, 18),  # Tuesday
-    2: (8, 18),  # Wednesday
-    3: (8, 18),  # Thursday
-    4: (8, 18),  # Friday
+    0: (8, 17),  # Monday: 8 AM - 5 PM
+    1: (8, 17),  # Tuesday
+    2: (8, 17),  # Wednesday
+    3: (8, 17),  # Thursday
+    4: (8, 17),  # Friday
     5: None,     # Saturday: off
     6: None      # Sunday: off
 }
@@ -49,9 +49,9 @@ while True:
         # Move relative to current position
         pyautogui.moveRel(delta_x, delta_y)
         result = current_time.strftime("%I:%M:%S %p")
-        print(f'Moved at {result} (delta: {delta_x}, {delta_y})')
+        print(f'[{current_time.strftime("%Y-%m-%d %H:%M:%S")}] Moved at {result} (delta: {delta_x}, {delta_y})')
     else:
-        print(f"Outside work hours. Sleeping until next check.")
+        print(f"[{current_time.strftime('%Y-%m-%d %H:%M:%S')}] Outside work hours. Sleeping until next check.")
     
     # Random sleep time between MIN and MAX
     sleep_time = random.uniform(MIN_SLEEP_MINUTES, MAX_SLEEP_MINUTES) * 60
