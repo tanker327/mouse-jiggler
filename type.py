@@ -31,7 +31,7 @@ def type_file_content(input_text):
     print("Typing now!")
     print("*" * 20)
 
-    pyautogui.typewrite(content, interval=0.1)
+    pyautogui.typewrite(content, interval=0.06)
     print("Done!")
 
 if __name__ == "__main__":

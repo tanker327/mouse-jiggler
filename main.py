@@ -11,7 +11,8 @@ MAX_MOVEMENT_PIXELS = 50  # Maximum pixels to move in any direction
 
 # Format: {day_of_week: (start_hour, end_hour)}
 WORK_SCHEDULE = {
-    0: (8, 17),  # Monday: 8 AM - 5 PM
+    0: (8
+        , 17),  # Monday: 8 AM - 5 PM
     1: (8, 17),  # Tuesday
     2: (8, 17),  # Wednesday
     3: (8, 17),  # Thursday
