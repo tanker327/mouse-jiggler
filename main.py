@@ -46,10 +46,39 @@ def next_work_start(now):
     return None
 
 
+def format_schedule():
+    names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    groups = []
+    i = 0
+    while i < 7:
+        j = i
+        while j + 1 < 7 and WORK_SCHEDULE[j + 1] == WORK_SCHEDULE[i]:
+            j += 1
+        label = names[i] if i == j else f"{names[i]}–{names[j]}"
+        sched = WORK_SCHEDULE[i]
+        if sched is None:
+            groups.append(f"{label} off")
+        else:
+            groups.append(f"{label} {sched[0]:02d}–{sched[1]:02d}")
+        i = j + 1
+    return "  ·  ".join(groups)
+
+
 def fmt_sleep(seconds):
     if seconds < 3600:
         return f"next in {seconds/60:.1f}m"
     return f"next in {seconds/3600:.2f}h"
+
+
+def fmt_runtime(delta):
+    total = int(delta.total_seconds())
+    h, rem = divmod(total, 3600)
+    m, s = divmod(rem, 60)
+    if h:
+        return f"{h}h {m}m"
+    if m:
+        return f"{m}m {s}s"
+    return f"{s}s"
 
 
 def row(t, color, glyph, message, suffix=None):
@@ -63,11 +92,33 @@ def row(t, color, glyph, message, suffix=None):
 
 def log_start():
     today = datetime.now().strftime("%a %d %b %Y")
-    print(f"{BOLD}▶ mouse-jiggler started{RESET}  {DIM}— {today} — Ctrl+C to stop{RESET}")
+    line1 = f"mouse-jiggler  ·  {today}"
+    line2 = f"schedule:  {format_schedule()}"
+    hint = "Ctrl+C to stop"
+    width = max(len(line1), len(line2), len(hint))
+    border = "─" * (width + 2)
+    print(f"{CYAN}╭{border}╮{RESET}")
+    print(f"{CYAN}│{RESET} {BOLD}{line1:<{width}}{RESET} {CYAN}│{RESET}")
+    print(f"{CYAN}│{RESET} {line2:<{width}} {CYAN}│{RESET}")
+    print(f"{CYAN}│{RESET} {DIM}{hint:<{width}}{RESET} {CYAN}│{RESET}")
+    print(f"{CYAN}╰{border}╯{RESET}")
 
 
-def log_stop():
-    print(f"{BOLD}■ stopped{RESET}")
+def log_day_divider(t):
+    label = t.strftime("%A %d %b")
+    bar = "─" * max(4, 60 - len(label) - 4)
+    print(f"{DIM}── {label} {bar}{RESET}")
+
+
+def log_stop(stats, runtime):
+    parts = [
+        f"ran {fmt_runtime(runtime)}",
+        f"moves {stats['moves']}",
+        f"skips {stats['skips']}",
+        f"re-centers {stats['recenters']}",
+        f"fail-safes {stats['failsafes']}",
+    ]
+    print(f"{BOLD}■ stopped{RESET}  {DIM}— {' · '.join(parts)}{RESET}")
 
 
 def log_move(t, delta, recentered, sleep_seconds):
@@ -98,10 +149,17 @@ def log_no_schedule(t, sleep_seconds):
 
 def main():
     log_start()
+    stats = {"moves": 0, "skips": 0, "recenters": 0, "failsafes": 0}
+    started_at = datetime.now()
     last_position = None
+    last_date = started_at.date()
     try:
         while True:
             current_time = datetime.now()
+            if current_time.date() != last_date:
+                log_day_divider(current_time)
+                last_date = current_time.date()
+
             schedule = WORK_SCHEDULE[current_time.weekday()]
             in_window = schedule and schedule[0] <= current_time.hour < schedule[1]
 
@@ -110,6 +168,7 @@ def main():
                 try:
                     current_x, current_y = pyautogui.position()
                     if last_position is not None and (current_x, current_y) != last_position:
+                        stats["skips"] += 1
                         log_skip(current_time, "user active", sleep_seconds)
                     else:
                         screen_width, screen_height = pyautogui.size()
@@ -120,14 +179,17 @@ def main():
                                       current_y > screen_height - edge_threshold)
                         if recentered:
                             pyautogui.moveTo(screen_width // 2, screen_height // 2)
+                            stats["recenters"] += 1
 
                         delta_x = random.randint(-MAX_MOVEMENT_PIXELS, MAX_MOVEMENT_PIXELS)
                         delta_y = random.randint(-MAX_MOVEMENT_PIXELS, MAX_MOVEMENT_PIXELS)
                         pyautogui.moveRel(delta_x, delta_y)
+                        stats["moves"] += 1
                         log_move(current_time, (delta_x, delta_y), recentered, sleep_seconds)
 
                     last_position = pyautogui.position()
                 except pyautogui.FailSafeException:
+                    stats["failsafes"] += 1
                     log_failsafe(current_time, sleep_seconds)
                     last_position = None
             else:
@@ -145,7 +207,7 @@ def main():
             time.sleep(sleep_seconds)
     except KeyboardInterrupt:
         print()
-        log_stop()
+        log_stop(stats, datetime.now() - started_at)
 
 
 if __name__ == "__main__":
